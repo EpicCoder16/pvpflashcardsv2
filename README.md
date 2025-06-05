@@ -19,7 +19,12 @@ git clone https://github.com/yourusername/pvpflashcards.git
 cd pvpflashcards
 ```
 
-2. The app uses Firebase for real-time functionality. The Firebase configuration is already set up in `config.js`.
+2. Set up Firebase configuration:
+   - Copy `config.example.js` to `config.secret.js`
+   - Create a new project in [Firebase Console](https://console.firebase.google.com)
+   - Enable Realtime Database in your Firebase project
+   - Copy your Firebase configuration from Project Settings
+   - Paste your configuration in `config.secret.js`
 
 3. To run locally, you can use any static file server. For example, with Python:
 ```bash
@@ -35,20 +40,22 @@ Then visit `http://localhost:8080` in your browser.
 
 ### GitHub Pages
 
-1. Push your code to GitHub
+1. Push your code to GitHub (note: don't commit `config.secret.js`)
 2. Go to repository Settings > Pages
 3. Under "Source", select "main" branch
 4. Click Save
 5. Your site will be published at `https://yourusername.github.io/pvpflashcards`
+6. After deployment, update `config.secret.js` on your deployed site with your Firebase configuration
 
 ### Netlify
 
-1. Push your code to GitHub
+1. Push your code to GitHub (note: don't commit `config.secret.js`)
 2. Go to [Netlify](https://www.netlify.com/)
 3. Click "New site from Git"
 4. Select your repository
-5. Deploy settings will be automatically configured
-6. Click "Deploy site"
+5. Add your Firebase configuration as environment variables in Netlify
+6. Deploy settings will be automatically configured
+7. Click "Deploy site"
 
 ## Usage
 
@@ -58,7 +65,7 @@ Then visit `http://localhost:8080` in your browser.
    - Click "Create Custom Questions"
    - Either enter questions manually or paste from Quizlet
    - Click "Save & Use"
-4. Choose number of questions (1-10)
+4. Choose number of questions (1-50)
 5. Share the game code with another player
 6. Play!
 
@@ -94,6 +101,8 @@ The game uses CSS variables for easy customization. Main colors can be modified 
   - Server-side validation
   - Rate limiting
   - Proper security rules in Firebase
+- Never commit sensitive information like API keys to version control
+- Use environment variables or secure secret management in production
 
 ## License
 
