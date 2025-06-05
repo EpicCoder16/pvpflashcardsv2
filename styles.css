@@ -1,0 +1,382 @@
+/* Global Styles */
+:root {
+    --primary-color: #6C63FF;
+    --secondary-color: #4CAF50;
+    --background-color: #F0F2F5;
+    --text-color: #2C3E50;
+    --card-color: #FFFFFF;
+    --error-color: #FF5252;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+/* Screen Management */
+.screen {
+    background: var(--card-color);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 95%;
+    max-width: 1000px;
+    text-align: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Typography */
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    font-size: 3.5rem;
+}
+
+h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+}
+
+/* Form Elements */
+input {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* Create Game Options */
+.create-game-options {
+    display: flex;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.create-game-options input[type="number"] {
+    width: 200px;
+    text-align: center;
+}
+
+/* Join Game */
+.join-game {
+    display: flex;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+/* Buttons */
+.primary-btn, .secondary-btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    white-space: nowrap;
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.secondary-btn {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.primary-btn:hover, .secondary-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Game Screen */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    font-size: 1.4rem;
+}
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.question-counter {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    background: rgba(108, 99, 255, 0.1);
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+}
+
+.player-score {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.timer {
+    background: var(--primary-color);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* Flashcard */
+.flashcard {
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+}
+
+.question {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    line-height: 1.4;
+}
+
+.options {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.option {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.option:hover:not(:disabled) {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.option:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.screen {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
+    .screen {
+        padding: 2rem;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+    }
+
+    .game-header {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .create-game-options,
+    .join-game {
+        flex-direction: column;
+    }
+
+    .create-game-options input[type="number"] {
+        width: 100%;
+    }
+
+    .options {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        padding: 2rem;
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+
+    .question {
+        font-size: 1.5rem;
+    }
+}
+
+/* Score Animation */
+@keyframes scoreUpdate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.score-update {
+    animation: scoreUpdate 0.5s ease;
+}
+
+/* Question Set Options */
+.question-set-options {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    justify-content: center;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 2rem;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--card-color);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 95%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-instructions {
+    margin: 1.5rem 0;
+    color: var(--text-color);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.modal textarea {
+    width: 100%;
+    padding: 1.5rem;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-family: monospace;
+    resize: vertical;
+    margin: 1rem 0;
+    min-height: 200px;
+}
+
+.modal textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+/* Modal Tabs */
+.modal-tabs {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 1rem;
+}
+
+.tab-btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    opacity: 1;
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+    margin-bottom: -1rem;
+}
+
+.tab-content {
+    display: block;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+#convertQuizletBtn {
+    margin: 1.5rem 0;
+    width: 100%;
+} 
