@@ -1,13 +1,16 @@
 // Import Firebase configuration from secret file
 // If running locally and config.secret.js doesn't exist, copy config.example.js to config.secret.js and fill in your values
-try {
-    if (!firebaseConfig) {
-        throw new Error('Firebase configuration not found. Please create config.secret.js from config.example.js');
-    }
-} catch (e) {
-    console.error('Firebase configuration error:', e);
-    alert('Firebase configuration is missing. Please check the console for instructions.');
-}
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyBwti4dCX0vvGTavP1uhfQuQwSR1V_cL5w",
+    authDomain: "pvpflashcard.firebaseapp.com",
+    databaseURL: "https://pvpflashcard-default-rtdb.firebaseio.com",
+    projectId: "pvpflashcard",
+    storageBucket: "pvpflashcard.firebasestorage.app",
+    messagingSenderId: "700599564670",
+    appId: "1:700599564670:web:045832ebfecc345bdadb2f",
+    measurementId: "G-FWTB1PQJCK"
+};
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
