@@ -17,11 +17,29 @@
                 <button id="createGameBtn" class="primary-btn">Create Game</button>
             </div>
             <div class="question-set-options">
+                <button id="browseSetBtn" class="secondary-btn">Browse Our Sets</button>
                 <button id="customSetBtn" class="secondary-btn">Create Custom Questions</button>
+            </div>
+            <div id="selectedSetInfo" class="selected-set-info hidden">
+                <p>Selected Set: <span id="selectedSetName">None</span></p>
+                <button id="clearSetBtn" class="text-btn">Clear Selection</button>
             </div>
             <div class="join-game">
                 <input type="text" id="gameCode" placeholder="Enter game code">
                 <button id="joinGameBtn" class="secondary-btn">Join Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Browse Sets Modal -->
+    <div id="browseSetsModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Browse Question Sets</h2>
+            <div id="questionSets" class="question-sets-grid">
+                <!-- Question sets will be populated here -->
+            </div>
+            <div class="modal-buttons">
+                <button id="closeBrowseBtn" class="secondary-btn">Close</button>
             </div>
         </div>
     </div>
@@ -41,22 +59,16 @@
                     One question per line
                 </p>
                 <textarea id="customQuestions" rows="10" placeholder="Example:
-What is 2+2?|4|3|5|6
-What is the capital of France?|Paris|London|Berlin|Madrid"></textarea>
+What is 2+2?|4|3|5|6"></textarea>
             </div>
             <div class="tab-content hidden" id="quizletTab">
                 <p class="modal-instructions">
-                    To import from Quizlet:<br>
-                    1. Open your Quizlet set<br>
-                    2. Copy all terms and definitions<br>
-                    3. Paste them below<br>
-                    4. Click "Convert from Quizlet"
+                    Copy and paste your Quizlet content below:
                 </p>
-                <textarea id="quizletPaste" rows="10" placeholder="Paste your copied Quizlet content here..."></textarea>
-                <button id="convertQuizletBtn" class="secondary-btn">Convert from Quizlet</button>
+                <textarea id="quizletPaste" rows="10" placeholder="Paste your Quizlet content here..."></textarea>
             </div>
             <div class="modal-buttons">
-                <button id="saveCustomSetBtn" class="primary-btn">Save & Use</button>
+                <button id="saveCustomSetBtn" class="primary-btn">Save Questions</button>
                 <button id="cancelCustomSetBtn" class="secondary-btn">Cancel</button>
             </div>
         </div>
@@ -80,6 +92,7 @@ What is the capital of France?|Paris|London|Berlin|Madrid"></textarea>
         <h2>Waiting Room</h2>
         <p>Game Code: <span id="displayGameCode"></span></p>
         <p>Questions in game: <span id="displayNumQuestions"></span></p>
+        <p>Question Set: <span id="displaySetName"></span></p>
         <p>Waiting for opponent...</p>
         <div id="players"></div>
     </div>
@@ -103,6 +116,9 @@ What is the capital of France?|Paris|London|Berlin|Madrid"></textarea>
             <div class="question" id="question"></div>
             <div class="options" id="options"></div>
         </div>
+        <div id="answerFeedback" class="answer-feedback hidden">
+            <span class="feedback-icon"></span>
+        </div>
     </div>
 
     <!-- Results Screen -->
@@ -119,7 +135,6 @@ What is the capital of France?|Paris|London|Berlin|Madrid"></textarea>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     
     <!-- App Scripts -->
-    <!-- <script src="config.secret.js"></script> -->
     <script src="config.js"></script>
     <script src="questions.js"></script>
     <script src="questionSets.js"></script>
