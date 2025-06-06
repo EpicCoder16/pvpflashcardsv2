@@ -1,7 +1,7 @@
 // Main application logic
 let currentGame = null;
 let questionManager = new QuestionSetManager();
-let customQuestions = null;
+let selectedQuestionSet = null;
 
 // DOM Elements
 const homeScreen = document.getElementById('homeScreen');
@@ -9,26 +9,85 @@ const waitingRoom = document.getElementById('waitingRoom');
 const gameScreen = document.getElementById('gameScreen');
 const resultsScreen = document.getElementById('resultsScreen');
 const customSetModal = document.getElementById('customSetModal');
+const browseSetsModal = document.getElementById('browseSetsModal');
 
 // Button Elements
 const createGameBtn = document.getElementById('createGameBtn');
 const joinGameBtn = document.getElementById('joinGameBtn');
 const playAgainBtn = document.getElementById('playAgainBtn');
 const customSetBtn = document.getElementById('customSetBtn');
+const browseSetBtn = document.getElementById('browseSetBtn');
 const saveCustomSetBtn = document.getElementById('saveCustomSetBtn');
 const cancelCustomSetBtn = document.getElementById('cancelCustomSetBtn');
-const convertQuizletBtn = document.getElementById('convertQuizletBtn');
+const closeBrowseBtn = document.getElementById('closeBrowseBtn');
+const clearSetBtn = document.getElementById('clearSetBtn');
 
 // Input Elements
 const usernameInput = document.getElementById('username');
 const gameCodeInput = document.getElementById('gameCode');
 const numQuestionsInput = document.getElementById('numQuestions');
 const customQuestionsInput = document.getElementById('customQuestions');
-const quizletPasteInput = document.getElementById('quizletPaste');
+const quizletPasteInput = document.getElementById('quizletPasteInput');
+
+// Display Elements
+const selectedSetName = document.getElementById('selectedSetName');
+const selectedSetInfo = document.getElementById('selectedSetInfo');
+const questionSets = document.getElementById('questionSets');
+const answerFeedback = document.getElementById('answerFeedback');
 
 // Tab Elements
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
+
+// Initialize question sets
+function initializeQuestionSets() {
+    questionSets.innerHTML = '';
+    defaultQuestionSets.forEach(set => {
+        const card = document.createElement('div');
+        card.className = 'question-set-card';
+        card.dataset.setId = set.id;
+        card.innerHTML = `
+            <h3>${set.name}</h3>
+            <p>${set.description}</p>
+            <p><small>${set.questions.length} questions</small></p>
+        `;
+        card.onclick = () => selectQuestionSet(set);
+        questionSets.appendChild(card);
+    });
+}
+
+// Select a question set
+function selectQuestionSet(set) {
+    selectedQuestionSet = set;
+    selectedSetName.textContent = set.name;
+    selectedSetInfo.classList.remove('hidden');
+    browseSetsModal.classList.add('hidden');
+    
+    // Update selected state in UI
+    document.querySelectorAll('.question-set-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.setId === set.id);
+    });
+}
+
+// Clear selected set
+clearSetBtn.onclick = () => {
+    selectedQuestionSet = null;
+    selectedSetName.textContent = 'None';
+    selectedSetInfo.classList.add('hidden');
+    document.querySelectorAll('.question-set-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+};
+
+// Show answer feedback
+function showAnswerFeedback(isCorrect) {
+    const feedbackIcon = answerFeedback.querySelector('.feedback-icon');
+    feedbackIcon.className = 'feedback-icon ' + (isCorrect ? 'correct' : 'incorrect');
+    answerFeedback.classList.remove('hidden');
+    setTimeout(() => {
+        answerFeedback.classList.add('hidden');
+    }, 1000);
+}
 
 // Tab switching logic
 tabButtons.forEach(button => {
@@ -47,69 +106,33 @@ tabButtons.forEach(button => {
     });
 });
 
-// Custom Question Set Modal
-customSetBtn.addEventListener('click', () => {
+// Modal controls
+browseSetBtn.onclick = () => {
+    browseSetsModal.classList.remove('hidden');
+};
+
+closeBrowseBtn.onclick = () => {
+    browseSetsModal.classList.add('hidden');
+};
+
+customSetBtn.onclick = () => {
     customSetModal.classList.remove('hidden');
-});
+};
 
-cancelCustomSetBtn.addEventListener('click', () => {
+cancelCustomSetBtn.onclick = () => {
     customSetModal.classList.add('hidden');
-    customQuestionsInput.value = '';
-    quizletPasteInput.value = '';
-});
-
-// Convert Quizlet paste to our format
-convertQuizletBtn.addEventListener('click', () => {
-    try {
-        const text = quizletPasteInput.value.trim();
-        if (!text) {
-            alert('Please paste your Quizlet content first');
-            return;
-        }
-
-        customQuestions = questionManager.convertFromQuizlet(text);
-        alert('Quizlet content converted successfully!');
-        
-        // Switch to manual tab to show the converted questions
-        const formattedQuestions = customQuestions.map(q => 
-            `${q.question}|${q.options[q.correctAnswer]}|${q.options.filter((_, i) => i !== q.correctAnswer).join('|')}`
-        ).join('\n');
-        
-        customQuestionsInput.value = formattedQuestions;
-        tabButtons[0].click(); // Switch to manual tab
-    } catch (error) {
-        alert('Error converting Quizlet content: ' + error.message);
-    }
-});
-
-saveCustomSetBtn.addEventListener('click', () => {
-    try {
-        const text = customQuestionsInput.value.trim();
-        if (!text) {
-            alert('Please enter some questions');
-            return;
-        }
-
-        customQuestions = questionManager.importFromText(text);
-        customSetModal.classList.add('hidden');
-        alert('Custom questions loaded successfully!');
-    } catch (error) {
-        alert('Error loading custom questions: ' + error.message);
-    }
-});
-
-// Validate number of questions input
-numQuestionsInput.addEventListener('change', () => {
-    const value = parseInt(numQuestionsInput.value);
-    if (value < 1) numQuestionsInput.value = 1;
-    if (value > 50) numQuestionsInput.value = 50;
-});
+};
 
 // Create Game
 createGameBtn.addEventListener('click', async () => {
     const username = usernameInput.value.trim();
     if (!username) {
         alert('Please enter a username');
+        return;
+    }
+
+    if (!selectedQuestionSet && !questionManager.getCurrentSet()) {
+        alert('Please select a question set or create your own');
         return;
     }
 
@@ -127,19 +150,42 @@ createGameBtn.addEventListener('click', async () => {
     };
 
     try {
-        // Get the current question set (custom or default)
-        const currentQuestions = questionManager.getCurrentSet();
+        // Get the current question set (custom or selected)
+        const currentQuestions = questionManager.getCurrentSet() || selectedQuestionSet.questions;
         
         // Create game room with current questions
-        await createGameRoom(gameCode, player, numQuestions, null, currentQuestions);
+        await createGameRoom(gameCode, player, numQuestions, selectedQuestionSet?.id, currentQuestions);
         currentGame = new Game(gameCode, player, numQuestions);
         
         homeScreen.classList.add('hidden');
         waitingRoom.classList.remove('hidden');
         document.getElementById('displayGameCode').textContent = gameCode;
         document.getElementById('displayNumQuestions').textContent = numQuestions;
+        document.getElementById('displaySetName').textContent = selectedQuestionSet ? selectedQuestionSet.name : 'Custom Set';
     } catch (error) {
         alert('Error creating game: ' + error.message);
+    }
+});
+
+// Save custom questions
+saveCustomSetBtn.addEventListener('click', () => {
+    const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+    let questions;
+
+    if (activeTab === 'manual') {
+        questions = parseManualQuestions(customQuestionsInput.value);
+    } else {
+        questions = parseQuizletQuestions(quizletPasteInput.value);
+    }
+
+    if (questions && questions.length > 0) {
+        questionManager.setCurrentSet(questions);
+        selectedQuestionSet = null;
+        selectedSetName.textContent = 'Custom Set';
+        selectedSetInfo.classList.remove('hidden');
+        customSetModal.classList.add('hidden');
+    } else {
+        alert('Please enter valid questions');
     }
 });
 
@@ -168,11 +214,7 @@ joinGameBtn.addEventListener('click', async () => {
 
         const gameData = await database.ref('games/' + gameCode).get();
         const numQuestions = gameData.val().numQuestions;
-
-        // Load custom questions if they exist
-        if (gameData.val().questionSetId) {
-            customQuestions = await questionManager.loadQuestionSet(gameData.val().questionSetId);
-        }
+        const setId = gameData.val().questionSetId;
 
         currentGame = new Game(gameCode, player, numQuestions);
         
@@ -180,6 +222,9 @@ joinGameBtn.addEventListener('click', async () => {
         waitingRoom.classList.remove('hidden');
         document.getElementById('displayGameCode').textContent = gameCode;
         document.getElementById('displayNumQuestions').textContent = numQuestions;
+        document.getElementById('displaySetName').textContent = setId ? 
+            defaultQuestionSets.find(set => set.id === setId)?.name || 'Custom Set' : 
+            'Custom Set';
     } catch (error) {
         alert('Error joining game: ' + error.message);
     }
@@ -199,9 +244,11 @@ playAgainBtn.addEventListener('click', () => {
     usernameInput.value = '';
     gameCodeInput.value = '';
     numQuestionsInput.value = '5';
-    customQuestions = null;
     customQuestionsInput.value = '';
     quizletPasteInput.value = '';
+    selectedQuestionSet = null;
+    selectedSetName.textContent = 'None';
+    selectedSetInfo.classList.add('hidden');
 });
 
 // Handle page unload
@@ -209,4 +256,7 @@ window.addEventListener('beforeunload', () => {
     if (currentGame) {
         currentGame.cleanup();
     }
-}); 
+});
+
+// Initialize question sets on load
+initializeQuestionSets(); 
