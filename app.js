@@ -1,3 +1,50 @@
+// Question Set Manager
+class QuestionSetManager {
+    constructor() {
+        this.currentSet = null;
+    }
+
+    getCurrentSet() {
+        return this.currentSet;
+    }
+
+    setCurrentSet(questions) {
+        this.currentSet = questions;
+    }
+
+    parseManualQuestions(text) {
+        const lines = text.trim().split('\n');
+        return lines.map(line => {
+            const [question, ...answers] = line.split('|').map(s => s.trim());
+            if (!question || answers.length < 4) {
+                throw new Error('Invalid question format');
+            }
+            return {
+                question: question,
+                options: answers,
+                correctIndex: 0
+            };
+        });
+    }
+
+    parseQuizletQuestions(text) {
+        const lines = text.trim().split('\n');
+        return lines.map(line => {
+            const [term, definition] = line.split('\t').map(s => s.trim());
+            if (!term || !definition) {
+                throw new Error('Invalid Quizlet format');
+            }
+            // Generate wrong answers (you might want to improve this)
+            const wrongAnswers = ['Incorrect 1', 'Incorrect 2', 'Incorrect 3'];
+            return {
+                question: term,
+                options: [definition, ...wrongAnswers],
+                correctIndex: 0
+            };
+        });
+    }
+}
+
 // Main application logic
 let currentGame = null;
 let questionManager = new QuestionSetManager();
@@ -131,14 +178,16 @@ createGameBtn.addEventListener('click', async () => {
         return;
     }
 
-    if (!selectedQuestionSet && !questionManager.getCurrentSet()) {
-        alert('Please select a question set or create your own');
-        return;
-    }
-
     const numQuestions = parseInt(numQuestionsInput.value);
     if (isNaN(numQuestions) || numQuestions < 1 || numQuestions > 50) {
         alert('Please enter a valid number of questions (1-50)');
+        return;
+    }
+
+    // Check for question set
+    const hasCustomSet = questionManager.getCurrentSet() && questionManager.getCurrentSet().length > 0;
+    if (!selectedQuestionSet && !hasCustomSet) {
+        alert('Please select a question set or create your own custom questions');
         return;
     }
 
@@ -151,7 +200,7 @@ createGameBtn.addEventListener('click', async () => {
 
     try {
         // Get the current question set (custom or selected)
-        const currentQuestions = questionManager.getCurrentSet() || selectedQuestionSet.questions;
+        const currentQuestions = hasCustomSet ? questionManager.getCurrentSet() : selectedQuestionSet.questions;
         
         // Create game room with current questions
         await createGameRoom(gameCode, player, numQuestions, selectedQuestionSet?.id, currentQuestions);
