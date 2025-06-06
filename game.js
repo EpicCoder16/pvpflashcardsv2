@@ -117,6 +117,9 @@ class Game {
             return;
         }
 
+        // Reset answer feedback
+        document.getElementById('answerFeedback').classList.add('hidden');
+
         // Get questions from game data
         this.gameRef.once('value', snapshot => {
             const gameData = snapshot.val();
@@ -141,32 +144,42 @@ class Game {
 
     submitAnswer(answerIndex) {
         if (this.hasAnswered) return;
-
-        this.hasAnswered = true;
-        const playerRef = this.gameRef.child('players').child(this.player.id);
         
-        // Get current question from game data
-        this.gameRef.once('value', snapshot => {
-            const gameData = snapshot.val();
-            if (!gameData || !gameData.questions) return;
-
-            const currentQuestion = gameData.questions[this.currentQuestion % gameData.questions.length];
-            const timeLeft = parseInt(document.getElementById('timer').textContent);
+        this.hasAnswered = true;
+        const currentTime = parseInt(document.getElementById('timer').textContent);
+        
+        this.gameRef.child('questions').once('value', snapshot => {
+            const questions = snapshot.val();
+            const currentQuestion = questions[this.currentQuestion];
+            const isCorrect = answerIndex === currentQuestion.correctIndex;
             
-            // Record answer in Firebase
+            // Show visual feedback
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                option.disabled = true;
+                if (index === currentQuestion.correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === answerIndex && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // Show feedback icon
+            showAnswerFeedback(isCorrect);
+            
+            // Record answer
             this.gameRef.child('answers').child(this.player.id).set({
                 answerIndex: answerIndex,
-                timeLeft: timeLeft
+                timeLeft: currentTime,
+                isCorrect: isCorrect
             });
-
-            if (answerIndex === currentQuestion.correctAnswer) {
-                const points = Math.max(5, timeLeft);
-                playerRef.child('score').transaction(score => (score || 0) + points);
+            
+            // Update score if correct
+            if (isCorrect) {
+                const scoreToAdd = Math.max(5, currentTime);
+                this.gameRef.child('players').child(this.player.id).child('score')
+                    .transaction(score => (score || 0) + scoreToAdd);
             }
-
-            // Disable options after answering
-            const options = document.querySelectorAll('.option');
-            options.forEach(option => option.disabled = true);
         });
     }
 
